@@ -23,7 +23,7 @@ docker run -d \
   -e ALT_PASSWORD \
   -v pgdata:/var/lib/postgresql/data \
   $IMAGE_NAME
-  
+
 
 docker network connect backend_net $CONTAINER_NAME
 
