@@ -71,7 +71,7 @@ services:
 #    user: "www-data"
 
   postgres-master:
-    image: postgres-master:1.2
+    image: postgres-master:1.0
     networks:
       db_net:
     ports:
@@ -116,7 +116,7 @@ services:
         max-file: "5"
 
   replica:
-    image: postgres-replica:1.0
+    image: postgres-replica:1.1
     networks:
       db_net:
     ports:
