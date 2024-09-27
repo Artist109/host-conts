@@ -1,0 +1,36 @@
+test_postgres-master.1.c5wlykwnsdor@debian    | The files belonging to this database system will be owned by user "postgres".
+test_postgres-master.1.c5wlykwnsdor@debian    | This user must also own the server process.
+test_postgres-master.1.c5wlykwnsdor@debian    | 
+test_postgres-master.1.c5wlykwnsdor@debian    | The database cluster will be initialized with locale "en_US.utf8".
+test_postgres-master.1.c5wlykwnsdor@debian    | The default database encoding has accordingly been set to "UTF8".
+test_postgres-master.1.c5wlykwnsdor@debian    | The default text search configuration will be set to "english".
+test_postgres-master.1.c5wlykwnsdor@debian    | 
+test_postgres-master.1.c5wlykwnsdor@debian    | Data page checksums are disabled.
+test_postgres-master.1.c5wlykwnsdor@debian    | 
+test_postgres-master.1.p074scaoypwz@debian    | The files belonging to this database system will be owned by user "postgres".
+test_postgres-master.1.p074scaoypwz@debian    | This user must also own the server process.
+test_postgres-master.1.p074scaoypwz@debian    | 
+test_postgres-master.1.p074scaoypwz@debian    | The database cluster will be initialized with locale "en_US.utf8".
+test_postgres-master.1.p074scaoypwz@debian    | The default database encoding has accordingly been set to "UTF8".
+test_postgres-master.1.p074scaoypwz@debian    | The default text search configuration will be set to "english".
+test_postgres-master.1.p074scaoypwz@debian    | 
+test_postgres-master.1.p074scaoypwz@debian    | Data page checksums are disabled.
+test_postgres-master.1.p074scaoypwz@debian    | 
+test_postgres-master.1.ixqawobdefo4@debian    | The files belonging to this database system will be owned by user "postgres".
+test_postgres-master.1.ixqawobdefo4@debian    | This user must also own the server process.
+test_postgres-master.1.ixqawobdefo4@debian    | 
+test_postgres-master.1.ixqawobdefo4@debian    | The database cluster will be initialized with locale "en_US.utf8".
+test_postgres-master.1.ixqawobdefo4@debian    | The default database encoding has accordingly been set to "UTF8".
+test_postgres-master.1.ixqawobdefo4@debian    | The default text search configuration will be set to "english".
+test_postgres-master.1.ixqawobdefo4@debian    | 
+test_postgres-master.1.ixqawobdefo4@debian    | Data page checksums are disabled.
+test_postgres-master.1.ixqawobdefo4@debian    | 
+test_postgres-master.1.uchvjxgmfupp@debian    | The files belonging to this database system will be owned by user "postgres".
+test_postgres-master.1.uchvjxgmfupp@debian    | This user must also own the server process.
+test_postgres-master.1.uchvjxgmfupp@debian    | 
+test_postgres-master.1.uchvjxgmfupp@debian    | The database cluster will be initialized with locale "en_US.utf8".
+test_postgres-master.1.uchvjxgmfupp@debian    | The default database encoding has accordingly been set to "UTF8".
+test_postgres-master.1.uchvjxgmfupp@debian    | The default text search configuration will be set to "english".
+test_postgres-master.1.uchvjxgmfupp@debian    | 
+test_postgres-master.1.uchvjxgmfupp@debian    | Data page checksums are disabled.
+test_postgres-master.1.uchvjxgmfupp@debian    | 

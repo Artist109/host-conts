@@ -4,7 +4,12 @@ RUN apt-get update && apt-get install -y  \
     cron \
     openssh-server \
     iputils-ping \
-    nano
+    nano && \
+    rm -rf /var/lib/apt/lists/*
+#    mkdir /var/run/sshd && \
+#    useradd -m barman && \
+#    sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config && \
+#    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
 
 #RUN useradd -m replicator
 
@@ -24,13 +29,7 @@ RUN apt-get update && apt-get install -y  \
 
 COPY init_db.sh /docker-entrypoint-initdb.d/init_db.sh
 
-COPY conf/pg_hba.conf /var/lib/postgresql/conf/
-COPY conf/postgresql.conf /var/lib/postgresql/conf/
-
-#EXPOSE 22
-
 EXPOSE 5432
+EXPOSE 22
 
-USER postgres
-
-CMD ["postgres"]
+#CMD ["/usr/sbin/sshd", "-D"]

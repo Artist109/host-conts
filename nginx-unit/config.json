@@ -1,6 +1,6 @@
 {
   "dbname": "test",
   "user": "test",
-  "host": "7lbdmz-keyng01",
+  "host": "postgres-master",
   "password": "test"
 }

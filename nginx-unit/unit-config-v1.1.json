@@ -1,0 +1,25 @@
+{
+  "listeners": {
+    "0.0.0.0:8400": {
+      "pass": "routes"
+    }
+  },
+  "routes": [
+    {
+      "action": {
+        "pass": "applications/nginx-unit"
+      }
+    }
+  ],
+  "applications": {
+    "nginx-unit": {
+      "type": "python 3",
+      "path": "/srv/nginx-unit/",
+      "module": "wsgi",
+      "callable": "app",
+      "environment": {
+        "PYTHONPATH": "/srv/nginx-unit/app-flask/lib/python3.11/site-packages"
+      }
+    }
+  }
+}

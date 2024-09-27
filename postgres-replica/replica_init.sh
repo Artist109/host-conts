@@ -1,19 +1,23 @@
 #!/bin/bash
 set -e
 
-REPLICA_PASSWORD=$(cat /run/secrets/postgres/replicator_pass)
+REPLICATOR_USER="replicator"
+REPLICATOR_PASSWORD="ReplicatorPass123"
 
-# Ждем, пока мастер не будет готов
 until pg_isready -h "$PG_PRIMARY_HOST" -p "$PG_PRIMARY_PORT"; do
   echo "Waiting for master PostgreSQL..."
   sleep 2
 done
 
-# Настройка параметров для репликации
-echo "primary_conninfo = 'host=$PG_PRIMARY_HOST port=$PG_PRIMARY_PORT user=replicator password=$REPLICA_PASSWORD'" >> /var/lib/postgresql/data/postgresql.conf
+mkdir -p /var/lib/postgresql/pg_backup
+pg_basebackup -h "$PG_PRIMARY_HOST" -D /var/lib/postgresql/pg_backup -U "$REPLICATOR_USER" -v -P -Xs
 
-# Запуск pg_basebackup для клонирования данных
-pg_basebackup -h "$PG_PRIMARY_HOST" -D /var/lib/postgresql/data -U replicator -v -P --wal-method=stream
+cp /tmp/postgresql.conf $PGDATA/postgresql.conf
+cp /tmp/pg_hba.conf $PGDATA/pg_hba.conf
+echo "primary_conninfo = 'host=$PG_PRIMARY_HOST port=$PG_PRIMARY_PORT user=$REPLICATOR_USER password=$REPLICATOR_PASSWORD'" >> /var/lib/postgresql/data/postgresql.conf
 
-# Создание файла сигнализации для реплики
+
 touch /var/lib/postgresql/data/standby.signal
+
+chown postgres:postgres $PGDATA/standby.signal
+chmod 700 $PGDATA/standby.signal

@@ -1,226 +1,213 @@
-version: "3.8"
+# version: "3.8"
 
 networks:
-  lb_net:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 10.249.7.0/24
-
   backend_net:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 10.219.7.0/24
-
   db_net:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 10.207.7.0/24
 
 services:
-  unit_python_01:
-    container_name: 7hs-keyunit01
+  nginx-unit:
+    image: nginx-unit:1.0
     depends_on:
       - postgres-master
-    build:
-      context: ./nginx-unit
-    networks:
-      backend_net:
-        ipv4_address: 10.219.7.1
-    volumes:
-      - ./nginx-plus:/app
-      - ./unit_config.json:/docker-entrypoint.d/config.json
-      - static_data:/app/static
-    #security_opt:
-    #  - "no-new-privileges:true"
-    #read_only: true
-    #cap_drop:
-    #  - "ALL"
-    user: "www-data"
-
-  unit_python_02:
-    container_name: 7hs-keyunit02
-    build:
-      context: ./nginx-unit
-    depends_on:
-      - postgres-master
-    networks:
-      backend_net:
-        ipv4_address: 10.219.7.2
-    volumes:
-      - ./nginx-plus:/app
-      - ./unit_config.json:/docker-entrypoint.d/config.json
-      - static_data:/app/static
-    #security_opt:
-    #  - "no-new-privileges:true"
-    #read_only: true
-    #cap_drop:
-    #  - "ALL"
-    user: "www-data"
-
-  unit_python_03:
-    container_name: 7hs-keyunit03
-    depends_on:
-      - postgres-master
-    build:
-      context: ./nginx-unit
-    networks:
-      backend_net:
-        ipv4_address: 10.219.7.3
-    volumes:
-      - ./nginx-plus:/app
-      - ./unit_config.json:/docker-entrypoint.d/config.json
-      - static_data:/app/static
-    #security_opt:
-    #  - "no-new-privileges:true"
-    #read_only: true
-    #cap_drop:
-    #  - "ALL"
-    user: "www-data"
-
-  nginx_balancer:
-    container_name: 7lbdmz-keyng01
-    depends_on:
-      - unit_python_01
-    build:
-      context: ./nginx-plus
-    networks:
-      lb_net:
-        ipv4_address: 10.249.7.1
     ports:
-      - "80:80"
+      - "8300:8300"
+    networks:
+      backend_net:
+      db_net:
+    configs:
+      - source: unit-config.json
+        target: /docker-entrypoint.d/unit-config.json
     volumes:
-      - ./conf/default.conf:/etc/nginx/conf.d/default.conf
-      - ./conf/nginx.conf:/etc/nginx/conf.d/nginx.conf
-      - static_data:/usr/share/nginx/html
-    #security_opt:
-    #  - "no-new-privileges:true"
-    #read_only: true
-    #cap_drop:
-    #  - "ALL"
-    user: "www-data"
+      - /srv/nginx-unit:/nginx-unit
+#       - static-data:/app/static
+#    read_only: true # дать права на /var/lib/unit/certs/ и /var/lib/unit/scripts/ и unix:/var/run/control.unit.sock.tmp)
+#    cap_drop:
+#      - "ALL"
+#    user: "www-data" permission denied
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+#  nginx-unit_02:
+#    container_name: 7hs-keyunit02
+#    build:
+#      context: ./nginx-unit
+#    depends_on:
+#      - postgres-master
+#    networks:
+#      backend_net:
+#        ipv4_address: 10.219.7.2
+#    volumes:
+#      - ./nginx-plus:/app
+#      - ./unit_config.json:/docker-entrypoint.d/config.json
+#      - static_data:/app/static
+#    security_opt:
+#      - "no-new-privileges:true"
+#    read_only: true
+#    cap_drop:
+#      - "ALL"
+#    user: "www-data"
+#
+#  nginx-unit_03:
+#    container_name: 7hs-keyunit03
+#    depends_on:
+#      - postgres-master
+#    build:
+#      context: ./nginx-unit
+#    networks:
+#      backend_net:
+#        ipv4_address: 10.219.7.3
+#    volumes:
+#      - ./nginx-plus:/app
+#      - ./unit_config.json:/docker-entrypoint.d/config.json
+#      - static_data:/app/static
+#    security_opt:
+#      - "no-new-privileges:true"
+#    read_only: true
+#    cap_drop:
+#      - "ALL"
+#    user: "www-data"
 
   postgres-master:
-    container_name: 7db-key01m
-    build:
-      context: ./postgres-master
+    image: postgres-master:1.2
     networks:
       db_net:
-        ipv4_address: 10.209.7.1
     ports:
       - "2222:22"
+      - "5432:5432"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-#    environment:
-#      POSTGRES_USER_FILE: /run/secrets/postgres_user
-#      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_master_password
-#      POSTGRES_DB_FILE: /run/secrets/postgres_db
-#      POSTGRES_HOST_AUTH_METHOD: ${POSTGRES_HOST_AUTH_METHOD}
+      POSTGRES_USER_FILE: /run/secrets/postgres_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_master_password
+      POSTGRES_DB_FILE: /run/secrets/postgres_db
+      ALT_PASSWORD_FILE: /run/secrets/alt_password
+      POSTGRES_T_U_FILE: /run/secrets/postgres_t_u
+      POSTGRES_T_P_FILE: /run/secrets/postgres_t_p
+      POSTGRES_DB_T_FILE: /run/secrets/postgres_db_t
+      REPLICATOR_USER_FILE: /run/secrets/replicator_user
+      REPLICATOR_PASSWORD_FILE: /run/secrets/replicator_password
+      REPLICA_PASSWORD_FILE: /run/secrets/replica_password
+      BARMAN_USER_FILE: /run/secrets/barman_user
+      BARMAN_PASSWORD_FILE: /run/secrets/barman_password
     volumes:
-      - master-data:/var/lib/postgresql/data
-      - ./postgres-master/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./postgres-master/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
-      - ./postgres-master/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
-      - ./barman/wal_archive:/var/lib/postgresql/wal_archive
-#      - ./secrets/ssh_private_key.pub:/home/replicator/.ssh/authorized_keys:ro
-#    secrets:
-#      - postgres_user
-#      - postgres_master_password
-#      - postgres_db
-
+      - /srv/postgres-master/conf/pg_hba.conf:/tmp/pg_hba.conf
+      - /srv/postgres-master/conf/postgresql.conf:/tmp/postgresql.conf
+#      - /srv/barman/wal_archive:/var/lib/postgresql/wal_archive
+#      - /srv/secrets/ssh_private_key.pub:/home/replicator/.ssh/authorized_keys:ro
+    secrets:
+      - postgres_user
+      - postgres_master_password
+      - postgres_db
+      - alt_password
+      - postgres_t_u
+      - postgres_t_p
+      - postgres_db_t
+      - replicator_user
+      - replicator_password
+      - replica_password
+      - barman_user
+      - barman_password
+    user: "postgres"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   replica:
-    container_name: 7db-key01r01
-    build: ./postgres-replica
+    image: postgres-replica:1.0
     networks:
       db_net:
-        ipv4_address: 10.209.7.10
+    ports:
+      - "2223:22"
+      - "5433:5432"
     environment:
-      #указывает путь к файлу, содержащему имя пользователя для подключения к основному серверу PostgreSQL (мастеру) при настройке репликации
-      PG_PRIMARY_USER: ${POSTGRES_REPLICA_USER}
-      PG_PRIMARY_PASSWORD: ${POSTGRES_REPLICA_PASSWORD}
-      PG_PRIMARY_HOST: 7db-hs01m
+      POSTGRES_USER_FILE: /run/secrets/postgres_user
+      POSTGRES_PASSWORD_FILE: /run/secrets/replica_password
+      POSTGRES_DB_FILE: /run/secrets/postgres_db
+      PG_PRIMARY_HOST: postgres-master
       PG_PRIMARY_PORT: 5432
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-#    environment:
-#      POSTGRES_USER_FILE: /run/secrets/postgres_user
-#      POSTGRES_DB_FILE: /run/secrets/postgres_db
-#      PG_PRIMARY_HOST: 7db-hs01m
-#      PG_PRIMARY_PORT: 5432
-#      PG_PRIMARY_USER_FILE: /run/secrets/postgres_replica_user
-#      PG_PRIMARY_PASSWORD_FILE: /run/secrets/replicator_password
-#      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_replica_password
+      REPLICATOR_USER_FILE: /run/secrets/replicator_user
+      REPLICATOR_PASSWORD_FILE: /run/secrets/replicator_password
     depends_on:
       - postgres-master
     volumes:
-      - replica-data:/var/lib/postgresql/data
-      - ./barman/wal_archive:/var/lib/postgresql/wal_archive
-    #security_opt:
-    #  - "no-new-privileges:true"
-    #read_only: true
-    #cap_drop:
-    #  - "ALL"
-#    secrets:
-#      - postgres_user
-#      - postgres_db
-#      - postgres_replica_user
-#      - replicator_password
-#      - postgres_replica_password
-  barman:
-    container_name: 7db-keybarman01
-    build: ./barman
-    networks:
-      db_net:
-        ipv4_address: 10.209.7.20
-    environment:
-        BARMAN_USER: ${BARMAN_USER}
-        BARMAN_PASSWORD: ${BARMAN_PASSWORD}
-    #    environment:
+      - /srv/postgres-replica/conf/pg_hba.conf:/tmp/pg_hba.conf
+      - /srv/postgres-replica/conf/postgresql.conf:/tmp/postgresql.conf
+#      - ./barman/wal_archive:/var/lib/postgresql/wal_archive
+#      - replica-data:/var/lib/postgresql/data
+#    read_only: true
+#    cap_drop:
+#      - "ALL"
+    user: "postgres"
+    secrets:
+      - postgres_user
+      - postgres_db
+      - replicator_user
+      - replicator_password
+      - replica_password
+
+#  barman:
+#    container_name: 7db-keybarman01
+#    build: ./barman
+#    networks:
+#      db_net:
+#        ipv4_address: 10.209.7.20
+#    environment:
 #      - BARMAN_USER=barman_user
 #      - BARMAN_PASSWORD_FILE=/run/secrets/barman_password
-    depends_on:
-      - postgres-master
-    ports:
-      - "22:22"
-    volumes:
-      - master-data:/var/lib/postgresql/data
-      - ./barman/config:/etc/barman.d
-      - ./barman/backups:/var/lib/barman
-      - ssh_private_key
-    secrets:
-      - barman_password
-      - ssh_private_key
-    #security_opt:
-    #  - "no-new-privileges:true"
-    #read_only: true
-    #cap_drop:
-    #  - "ALL"
+#    depends_on:
+#      - postgres-master
+#    ports:
+#      - "22:22"
+#    volumes:
+#      - pg-data:/var/lib/postgresql/data
+#      - ./barman/config:/etc/barman.d
+#      - ./barman/backups:/var/lib/barman
+#      - ssh_private_key
+#    secrets:
+#      - barman_password
+#      - ssh_private_key
+#    security_opt:
+#      - "no-new-privileges:true"
+#    read_only: true
+#    cap_drop:
+#      - "ALL"
 
 volumes:
-  master-data:
+  pg-data:
   replica-data:
-  static_data:
+  static-data:
 
-#secrets:
-#  postgres_user:
-#    file: ./secrets/postgres/postgres_user.txt
-#  postgres_replica_user:
-#    file: ./secrets/postgres/replica_user.txt
-#  postgres_master_password:
-#    file: ./secrets/postgres/master_pass.txt
-#  postgres_replica_password:
-#    file: ./secrets/postgres/replica_pass.txt
-#  replicator_password:
-#    file: ./secrets/postgres/replicator_pass.txt
-#  barman_password:
-#    file: ./secrets/postgres/barman_pass.txt
-#  postgres_db:
-#    file: ./secrets/postgres/postgres_db.txt
-#  ssh_private_key:
-#    file: ./secrets/ssh_private_key
+configs:
+  unit-config.json:
+    external: true
+
+secrets:
+  postgres_user:
+    file: ./secrets/postgres/postgres_user.txt
+  postgres_master_password:
+    file: ./secrets/postgres/master_pass.txt
+  alt_password:
+    file: ./secrets/postgres/alt_pass.txt
+  postgres_t_u:
+    file: ./secrets/postgres/postgres_t_u.txt
+  postgres_t_p:
+    file: ./secrets/postgres/postgres_t_p.txt
+  postgres_db_t:
+    file: ./secrets/postgres/postgres_db_t.txt
+  replicator_user:
+    file: ./secrets/postgres/replicator_user.txt
+  replicator_password:
+    file: ./secrets/postgres/replicator_pass.txt
+  replica_password:
+    file: ./secrets/postgres/replica_pass.txt
+  barman_user:
+    file: ./secrets/postgres/barman_user.txt
+  barman_password:
+    file: ./secrets/postgres/barman_pass.txt
+  postgres_db:
+    file: ./secrets/postgres/postgres_db.txt
+  ssh_private_key:
+    file: ./secrets/ssh_private_key

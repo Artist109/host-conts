@@ -12,3 +12,4 @@
 /secrets/
 
 .env
+nginx-unit-v1.0.tar
