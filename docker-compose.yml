@@ -91,6 +91,7 @@ services:
       BARMAN_USER_FILE: /run/secrets/barman_user
       BARMAN_PASSWORD_FILE: /run/secrets/barman_password
     volumes:
+#      - /srv/postgres-master/data/:/var/lib/postgresql/data
       - /srv/postgres-master/conf/pg_hba.conf:/tmp/pg_hba.conf
       - /srv/postgres-master/conf/postgresql.conf:/tmp/postgresql.conf
 #      - /srv/barman/wal_archive:/var/lib/postgresql/wal_archive
@@ -133,6 +134,7 @@ services:
     depends_on:
       - postgres-master
     volumes:
+#      - /srv/postgres-replica/data/:/var/lib/postgresql/data
       - /srv/postgres-replica/conf/pg_hba.conf:/tmp/pg_hba.conf
       - /srv/postgres-replica/conf/postgresql.conf:/tmp/postgresql.conf
 #      - ./barman/wal_archive:/var/lib/postgresql/wal_archive

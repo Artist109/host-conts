@@ -1,6 +1,6 @@
 FROM postgres:16-bookworm
 
-RUN apt-get update && apt-get install -y rsync
+RUN apt-get update && apt-get install -y iputils-ping nano
 
 COPY replica_init.sh /docker-entrypoint-initdb.d/
 
